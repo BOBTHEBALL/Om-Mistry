@@ -13,7 +13,7 @@
 
 header {
     grid-area: header;
-    background-color: #f00;
+    background-color: #005cff;
     padding: 1rem;
 }
 
@@ -24,14 +24,14 @@ nav {
 main {
     grid-area: main;
     padding: 1rem;
-    background-color: #edd;
+    background-color: #005cff;
 }
 
 h1, h2, h3, h4 {
     padding: 1rem 0;
     font-family: 'Suez One', serif;
-    color: #000;
-    text-shadow: 2px 2px 4px #fff;
+    color: #000000;
+    text-shadow: 2px 2px 4px #005cff;
 }
 
 p {
@@ -39,17 +39,18 @@ p {
 }
 
 a {
-    color: #222;
+    color: #ffffff;
 }
 
-img {
-    width: 100%;
+object {
+    width: 500px;
 }
+object>img{width: 300px;}
 .dataForm {
     margin: 1rem 0;
-    border: 1px solid #999;
+    border: 1px solid #005cff;
     padding: 1rem;
-    background-color: #fcc;
+    background-color: #005cff;
     border-radius: 10px;
 }
 
@@ -67,29 +68,29 @@ img {
 }
 
 .error {
-    color: #f00;
+    color: #ffffff;
 }
 
 .login {
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 2px dashed #fff;
+    border-top: 2px dashed #005cff;
 }
 
 table {
     width: 100%;
-    border: 2px solid #666;
+    border: 2px solid #ffffff;
     border-collapse: collapse;
 }
 
 th, td {
-    border: 1px solid #888;
+    border: 1px solid #ffffff;
     padding: 0.2rem;
     text-align: left;
 }
 th {
-    background-color: #000;
-    color: #fff;
+    background-color: #000000;
+    color: #ffffff;
 }
 
 img .thumb {
@@ -98,12 +99,12 @@ img .thumb {
 footer {
     grid-area: footer;
     padding: 1rem;
-    background-color: #f00;
+    background-color: #005cff;
 }
 
 footer p {
-    color: #000;
-    text-shadow: 2px 2px 4px #fff;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px #005cff;
     font-size: 1.5rem;
 }
 
@@ -128,13 +129,13 @@ footer img {
     nav a
     {
       text-decoration: none;
-      color: #232323;
+      color: #ffffff;
       transition: color 0.3s ease;
     }
 
     nav a:hover
     {
-      color: tomato;
+      color: #005cff;
     }
 
 
@@ -166,7 +167,7 @@ footer img {
       margin-bottom: 5px;
       position: relative;
 
-      background: #000;
+      background: #ffffff;
       border-radius: 3px;
 
       z-index: 1;
@@ -196,7 +197,7 @@ footer img {
     {
       opacity: 1;
       transform: rotate(45deg) translate(-2px, -1px);
-      background: #000;
+      background: #ffffff;
     }
 
     /*
@@ -228,7 +229,7 @@ footer img {
       padding: 50px;
       padding-top: 125px;
 
-      background: #ed9999;
+      background: #00a5ff;
       list-style-type: none;
       -webkit-font-smoothing: antialiased;
       /* to stop flickering of text in safari */
@@ -260,7 +261,7 @@ footer img {
     }
 
     nav {
-        background: linear-gradient(180deg, rgba(255,0,0,1) 0%, rgba(0, 0, 0, 1) 50%,  rgba(255,0,0,1) 100%);
+        background: linear-gradient(180deg, rgb(0, 92, 255) 0%, rgb(0, 0, 0) 50%, rgb(0, 144, 255) 100%);
         padding: 0.5rem;
     }
 
@@ -271,13 +272,13 @@ footer img {
         padding: 0.2rem 0;
     }
     nav a {
-        color: #fff;
+        color: #fdfdfd;
         text-decoration: none;
     }
 
     nav a:hover {
         color: #000;
-        background-color: #fff;
+        background-color: #ffffff;
     }
     nav input, nav span {
         visibility: hidden;
