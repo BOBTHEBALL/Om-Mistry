@@ -1,22 +1,22 @@
 {% extends 'base.html' %}
 
-{% block title %}Maōri Dictionary | Home{% endblock %}
+{% block title %}Māori Dictionary | Home{% endblock %}
 
-{% block heading %}Maōri - English Dictionary{% endblock %}
+{% block heading %}Māori - English Dictionary{% endblock %}
 
 {% block main %}
-This is an english and Maori dictionary. It will be used to give everyone the chance to learn a great language.
+This is an English and Māori dictionary. It will be used to give everyone the chance to learn a great language.
 {% if logged_in %}
     <li>You are logged in</li>
-        <form class="dataForm" method="POST">
+        <form> class="dataForm" method="POST">
     <div class="form-group">
             <div class="form-label"><label for="category">Add a category:</label></div>
             <div class="form-element"><input name="category" id="category" type="category"></div>
         </div>
     <div class="form-group">
         <div class="form-element"><input type="submit"></div>
-    </div>
-
+        </div>
+        </form>
 {% else %}
     <li>Make an account to change stuff</li>
 {% endif %}

@@ -11,7 +11,6 @@ app.secret_key = "ghjk;']'[569GHJ%^[;lasdhujkseglf7^%^bhtrjkg';&((*%^*&#$ghkdfgu
 
 DB_NAME = "dictionary.db"
 
-
 def create_connection(db_file):
     """create a connection to the sqlite db - maori.db"""
     try:
@@ -22,7 +21,6 @@ def create_connection(db_file):
 
     return None
 
-
 def fetch_categories():
     con = create_connection(DB_NAME)
     query = "SELECT id, category_name FROM category"
@@ -32,12 +30,27 @@ def fetch_categories():
     con.close()
     return categories
 
-
-@app.route('/')
+@app.route('/', methods=["GET", "POST"])
 def render_homepage():
     print("loading home page")
-    return render_template('home.html', logged_in=is_logged_in(), categories=fetch_categories())
 
+    if request.method == 'POST':
+        print(request.form)
+        category = request.form.get("category")
+        print(category)
+
+        if request.method == 'POST':
+            print(request.form)
+
+            con = create_connection(DB_NAME)
+
+            query = "INSERT INTO customers (id, fname, lname, email, password) " \
+                    "VALUES(NULL,?,?,?,?)"
+
+            cur = con.cursor()  # You need this line next
+        return redirect('/login')
+
+    return render_template('home.html', logged_in=is_logged_in(), categories=fetch_categories())
 
 @app.route('/categories/<cat_id>')
 def render_categorypage(cat_id):
@@ -63,7 +76,6 @@ def render_detailpage(word_id):
     con.close()
     return render_template('detail.html', definitions=definition, logged_in=is_logged_in(),
                            categories=fetch_categories())
-
 
 @app.route('/login', methods=["GET", "POST"])
 def render_login_page():
@@ -132,7 +144,7 @@ def render_signup_page():
 
         cur = con.cursor()  # You need this line next
         try:
-            cur.execute(query, (fname, lname, email, hashed_password))  # this line actually executes the query
+            cur.execute(query, (fname, lname, email, hashed_password))  # this line executes the query
         except sqlite3.IntegrityError:
             return redirect('/signup?error=Email+is+already+used')
 
