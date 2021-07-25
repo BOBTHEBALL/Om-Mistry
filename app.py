@@ -160,15 +160,15 @@ def logout():
     print(list(session.keys()))
     [session.pop(key) for key in list(session.keys())]
     print(list(session.keys()))
-    return redirect('/?message=See+you+next+time!')
+    return redirect('/?message=See+you+later!')
 
 
 def is_logged_in():
     if session.get("email") is None:
-        print("not logged in")
+        print("you are not logged in")
         return False
     else:
-        print("logged in")
+        print("you are logged in")
         return True
 
 @app.route('/menu')

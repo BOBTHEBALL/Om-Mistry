@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Maori Dictionary.iml" filepath="$PROJECT_DIR$/.idea/Maori Dictionary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Maori Dictionary Internal.iml" filepath="$PROJECT_DIR$/.idea/Maori Dictionary Internal.iml" />
     </modules>
   </component>
 </project>
