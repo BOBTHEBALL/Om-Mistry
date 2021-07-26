@@ -32,23 +32,24 @@ def fetch_categories():
 
 @app.route('/', methods=["GET", "POST"])
 def render_homepage():
-    print("loading home page")
-
-    if request.method == 'POST':
-        print(request.form)
-        category = request.form.get("category")
-        print(category)
-
-        if request.method == 'POST':
-            print(request.form)
-
+    if request.method == "POST" and is_logged_in():
+        category_name = request.form.get('category').strip().lower()
+        if len(category_name) < 3:
+            return redirect("/?error=Name+must+be+at+least+3+letters+long.")
+        else:
+            # connect to the database
             con = create_connection(DB_NAME)
 
-            query = "INSERT INTO customers (id, fname, lname, email, password) " \
-                    "VALUES(NULL,?,?,?,?)"
+            query = "INSERT INTO category (id, category_name) VALUES(NULL, ?)"
 
             cur = con.cursor()  # You need this line next
-        return redirect('/login')
+            try:
+                cur.execute(query, (category_name, ))  # this line actually executes the query
+            except:
+                return redirect('/menu?error=Unknown+error')
+
+            con.commit()
+            con.close()
 
     return render_template('home.html', logged_in=is_logged_in(), categories=fetch_categories())
 
@@ -93,7 +94,7 @@ def render_login_page():
         user_data = cur.fetchall()
         con.close()
         # if given the email is not in the database this will raise an error
-        # would be better to find out how to see if the query return an empty resultset
+        #
         try:
             userid = user_data[0][0]
             firstname = user_data[0][1]
