@@ -212,7 +212,9 @@ def is_logged_in():
 def render_menu():
     return render_template('menu.html')
 
-
+@app.route('/delete')
+def render_delete():
+    return render_template('   ')
 
 if __name__ == "__main__":
     app.run(debug=True)
