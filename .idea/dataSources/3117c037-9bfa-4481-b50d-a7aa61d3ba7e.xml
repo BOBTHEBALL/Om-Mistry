@@ -1431,6 +1431,11 @@
     <column id="517" parent="174" name="id">
       <Position>7</Position>
       <DataType>integer|0s</DataType>
+      <SequenceIdentity>null</SequenceIdentity>
     </column>
+    <key id="518" parent="174" name="words_pk">
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
   </database-model>
 </dataSource>

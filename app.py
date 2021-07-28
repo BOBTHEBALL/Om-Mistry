@@ -36,7 +36,7 @@ def fetch_categories():
 @app.route('/', methods=["GET", "POST"])
 def render_homepage():
     if request.method == "POST" and is_logged_in():
-        category_name = request.form.get('category').strip().lower()
+        category_name = request.form.get('category')
         if len(category_name) < 3:
             return redirect("/?error=Name+must+be+at+least+3+letters+long.")
         else:
@@ -57,38 +57,38 @@ def render_homepage():
     return render_template('home.html', logged_in=is_logged_in(), categories=fetch_categories())
 
 
-def render_word(category):
+@app.route('/categories/<cat_id>', methods=["POST", "GET"])
+def render_categorypage(cat_id):
     if request.method == "POST" and is_logged_in():
-        maori = request.form['maori'].strip().title()
-        english = request.form['english'].strip().title()
-        category = request.form['category']
-        definition = request.form['definition'].strip().title()
-        levels = request.form['levels'].strip().lower()
+        maori = request.form['Maori Word'].strip().title()
+        english = request.form['English Word'].strip().title()
+        category = request.form['Word Category']
+        definition = request.form['Description'].strip().title()
+        levels = request.form['Difficulty Level']
 
         if len(english) < 1:
-            return redirect("/menu?error=Surame+must+be+at+least+2+letters+long.")
+            return redirect("/menu?error=Wrong")
         elif len(maori) < 1:
-            return redirect("/menu?error=First+Name+must+be+at+least+3+letters+long.")
+            return redirect("/menu?error=Wrong")
         else:
             # connect to the database
             con = create_connection(DB_NAME)
 
             query = "INSERT INTO words (maori, english, category, definition, levels, images, id) " \
-                    "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?)"
+                    "VALUES(?, ?, ?, ?, ?, ?, NULL)"
 
             cur = con.cursor()  # You need this line next
             editor_id = session['userid']
             try:
-                cur.execute(query, (maori, english, category, definition, levels, editor_id))  # this line actually executes the query
+                cur.execute(query, (
+                maori, english, category, definition, levels, editor_id))  # this line actually executes the query
             except:
-                return redirect('/menu?error=Unknown+error')
+                return redirect('/categories/' + cat_id + '?error=Unknown+error')
 
             con.commit()
             con.close()
 
 
-@app.route('/categories/<cat_id>')
-def render_categorypage(cat_id):
     con = create_connection(DB_NAME)
     query = "SELECT id, maori, english, definition, levels, images FROM words WHERE category=?" \
             "ORDER BY maori ASC"
@@ -104,12 +104,12 @@ def render_categorypage(cat_id):
 @app.route('/word/<word_id>')
 def render_detailpage(word_id):
     con = create_connection(DB_NAME)
-    query = "SELECT maori, english, definition, levels, image FROM words WHERE id=?"
+    query = "SELECT id, maori, english, definition, levels, images FROM words WHERE id=?"
     cur = con.cursor()
     cur.execute(query, (word_id,))
     definition = cur.fetchall()[0]
     con.close()
-    return render_template('detail.html', definitions=definition, logged_in=is_logged_in(),
+    return render_template('detail.html', definition=definition, logged_in=is_logged_in(),
                            categories=fetch_categories())
 
 
