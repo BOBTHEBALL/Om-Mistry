@@ -3,6 +3,7 @@ import sqlite3
 from sqlite3 import Error
 from flask_bcrypt import Bcrypt
 from datetime import datetime
+
 # this is the stuff I am importing to use for the future of my project
 app = Flask(__name__)
 
@@ -11,6 +12,8 @@ app.secret_key = "ghjk;']'[569GHJ%^[;lasdhujkseglf7^%^bhtrjkg';&((*%^*&#$ghkdfgu
                  "F&*TG#$fjhSDJKF3487034[DW}_*$+HBDIUy894y389yUASDGfiwo9A(P{34(*SADtf#Wjg)"
 
 DB_NAME = "dictionary.db"
+
+
 # This is the name of my dictionary
 
 def intention(button):
@@ -18,6 +21,8 @@ def intention(button):
         return True
     else:
         return False
+
+
 #
 
 def create_connection(db_file):
@@ -29,6 +34,8 @@ def create_connection(db_file):
         print(e)
 
     return None
+
+
 # This will create a connection with SQLite allowing me to use it in the future.
 
 def fetch_categories():
@@ -39,6 +46,8 @@ def fetch_categories():
     categories = cur.fetchall()
     con.close()
     return categories
+
+
 # This is fetching the categories so I can use them in my code later on
 
 
@@ -63,21 +72,19 @@ def render_homepage():
                 return redirect(request.referrer)
                 return redirect('/?error=Unknown+error')
 
-
-
             con.commit()
             con.close()
 
     return render_template('home.html', logged_in=is_logged_in(), categories=fetch_categories())
     # This renders the home template which I will use to place many different important things
 
+
 @app.route('/categories/<cat_id>', methods=["POST", "GET"])
 # This creates a webpage and then it
 def render_categorypage(cat_id):
     if request.method == "POST" and is_logged_in():
         category = request.form.get('Category')
-        if request.form.get("delete") == "Delete Category":
-
+        if request.form.get("form") == "delete":
             con = create_connection(DB_NAME)
             cur = con.cursor()
             query = "DELETE FROM category WHERE id=?"
@@ -87,13 +94,13 @@ def render_categorypage(cat_id):
             return redirect('/')
 
         print(request.form)
-# This renders the page for the different word categories and it creates a connection with database
+        # This renders the page for the different word categories and it creates a connection with database
         category = request.form.get('Category')
         maori = request.form.get('Maori Word').strip().title()
         english = request.form.get('English Word').strip().title()
         definition = request.form.get('Description').strip().title()
         levels = request.form.get('Difficulty Level')
-# This code above is used to pull information from the website regarding the items in the brackets. It then strips them
+        # This code above is used to pull information from the website regarding the items in the brackets. It then strips them
         # of their unnecessary spaces and then gives them title case.
         deleting = request.form.get('deleting')
         if len(english) < 1:
@@ -112,13 +119,29 @@ def render_categorypage(cat_id):
             try:
                 # This line is used to execute the query
                 cur.execute(query, (
-                maori, english, category, definition, levels, editor_id))
+                    maori, english, category, definition, levels, editor_id))
             except:
                 return redirect('/categories/' + cat_id + '?error=Unknown+error')
 
             con.commit()
             con.close()
 
+        if request.form.get("form") == "edit":
+            con = create_connection(DB_NAME)
+            # This connects it to the database
+            query = "UPDATE INTO words SET (maori, english, category, definition, levels, images, id) " \
+                    "VALUES(?, ?, ?, ?, ?, ?, NULL)"
+
+            editor_id = session['userid']
+            try:
+                # This line is used to execute the query
+                cur.execute(query, (
+                    maori, english, category, definition, levels, editor_id))
+            except:
+                return redirect('/categories/' + cat_id + '?error=Unknown+error')
+
+            con.commit()
+            con.close()
 
         if deleting == "False":
             english = request.form.get('english').strip().title()
@@ -135,7 +158,6 @@ def render_categorypage(cat_id):
             word_repeated = cur.fetchall()
             # This puts the result into the table
             con.close()
-
 
             date_added = datetime.today().strftime("%A, %d, %B, %Y")
             user_id = session['userid']
@@ -162,15 +184,14 @@ def render_categorypage(cat_id):
                 print("test 3")
                 con = create_connection(DB_NAME)
                 query = "INSERT INTO words(id, maori, english, definitions, levels, category, images, editor_id, date_added) " \
-                    "VALUES(NULL,?,?,?,?,?, 'noimage', ?, ? )"
+                        "VALUES(NULL,?,?,?,?,?, 'noimage', ?, ? )"
                 cur = con.cursor()
                 cur.execute(query, (maori, english, definitions, levels, cat_id, user_id, date_added))
                 con.commit()
                 con.close()
                 print("test 4")
                 # This code above is used to secure the location of where the words are, this allows it to find out
-    #             Where duplicate words are
-
+    #             Where duplicate words are.
 
     con = create_connection(DB_NAME)
     query = "SELECT id, maori, english, definition, levels, images FROM words WHERE category=?" \
@@ -184,12 +205,15 @@ def render_categorypage(cat_id):
                            categories=fetch_categories(), category=cat_id)
 
 
+# This again creates a connection to the dictionary but then it allows the words and categories to be deleted
+# from the template
+
 
 @app.route('/detail/<word_id>', methods=["POST", "GET"])
 def render_detailpage(word_id):
-
+    # This also creates a webpage but this one is for the word details, e.g when you click on a word
     if request.method == "POST" and is_logged_in():
-
+        # This line here makes sure that you have to be logged in to actually add/delete/edit
         if "delete_confirm" in request.form:
             print(request.form)
             con = create_connection(DB_NAME)
@@ -209,14 +233,15 @@ def render_detailpage(word_id):
     definition = cur.fetchall()[0]
     print(word_id)
 
-
-        # query = "DELETE FROM words WHERE id = ?"
-        # cur = con.cursor()
-        # print(word_id)
-        # cur.execute(query, (word_id,))
-        # con.close()
-    return render_template('detail.html', definition=definition, logged_in=is_logged_in(), categories=fetch_categories(),
+    # query = "DELETE FROM words WHERE id = ?"
+    # cur = con.cursor()
+    # print(word_id)
+    # cur.execute(query, (word_id,))
+    # con.close()
+    return render_template('detail.html', definition=definition, logged_in=is_logged_in(),
+                           categories=fetch_categories(),
                            deleting=intention("delete"))
+
 
 @app.route('/login', methods=["GET", "POST"])
 def render_login_page():
@@ -255,13 +280,13 @@ def render_login_page():
         return redirect('/')
 
     return render_template('login.html', logged_in=is_logged_in())
-
+# This makes it sure that you are logged in
 
 @app.route('/signup', methods=['GET', 'POST'])
 def render_signup_page():
     if is_logged_in():
         return redirect('/')
-
+    # This is the webpage for the signup
     if request.method == 'POST':
         print(request.form)
         fname = request.form.get('fname').strip().title()
@@ -269,7 +294,7 @@ def render_signup_page():
         email = request.form.get('email').strip().lower()
         password = request.form.get('password')
         password2 = request.form.get('password2')
-
+        # These are the requirements for the sign in
         if password != password2:
             return redirect('/signup?error=Passwords+dont+match')
 
@@ -279,7 +304,7 @@ def render_signup_page():
         hashed_password = bcrypt.generate_password_hash(password)
 
         con = create_connection(DB_NAME)
-
+        # This creates a connection
         query = "INSERT INTO customers (id, fname, lname, email, password) " \
                 "VALUES(NULL,?,?,?,?)"
 
@@ -288,13 +313,14 @@ def render_signup_page():
             cur.execute(query, (fname, lname, email, hashed_password))  # this line executes the query
         except sqlite3.IntegrityError:
             return redirect('/signup?error=Email+is+already+used')
-
+        # This gives the sign that the email is already in use when you try to signup with a used email
         con.commit()
         con.close()
         return redirect('/login')
 
     return render_template('signup.html', logged_in=is_logged_in())
 
+# This makes it so you need to be logged in
 #
 # "delete_confirm" in request.form:()
 #             con = create_connection(DB_NAME)
@@ -314,7 +340,7 @@ def logout():
     [session.pop(key) for key in list(session.keys())]
     print(list(session.keys()))
     return redirect('/?message=See+you+later!')
-
+# This gives you a message when you log out
 
 def is_logged_in():
     if session.get("email") is None:
@@ -323,7 +349,7 @@ def is_logged_in():
     else:
         print("you are logged in")
         return True
-
+# This is used to tell you if you are logged in or not
 
 # @app.route('/menu')
 # def render_menu():
@@ -336,4 +362,3 @@ def is_logged_in():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
