@@ -5,24 +5,46 @@
 {% block heading %}Maōri - English Dictionary{% endblock %}
 
 {% block main %}
-<table>
-    <tr>
-        <th>Maori Word</th>
-        <th>English Word</th>
-        <th>Definition</th>
-        <th>Difficulty</th>
-        <th>Image</th>
-    </tr>
-{#    {% for definition in definitions %}#}
-    <tr>
-        <td>{{ definition[1] }}</td>
-        <td>{{ definition[2] }}</td>
-        <td>{{ definition[3] }}</td>
-        <td>{{ definition[4] }}</td>
-        <td><img src="/static/images/{{ definition[5] }}"></td>
-    </tr>
-{#    {% endfor %}#}
-</table>
-<button id="delete button" onclick="return window.confirm('Are you sure you want to do this karl?')">delete the word</button>
-{#<input type="submit">#}
+    <table>
+        <tr>
+            <th>Maori Word</th>
+            <th>English Word</th>
+            <th>Definition</th>
+            <th>Difficulty</th>
+            <th>Image</th>
+        </tr>
+        {#    {% for definition in definitions %}#}
+        <tr>
+            <td>{{ definition[1] }}</td>
+            <td>{{ definition[2] }}</td>
+            <td>{{ definition[3] }}</td>
+            <td>{{ definition[4] }}</td>
+            <td><img src="/static/images/{{ definition[5] }}"></td>
+        </tr>
+        {#    {% endfor %}#}
+    </table>
+<form method="POST">
+    {% if deleting %}
+        <div class="form-element">Are you sure?<input type="submit" name="delete_confirm" value="Yes">/<input type="submit" value="No"></div>
+    {% else %}
+    <div class="form-element">
+         <input type="hidden" name="deleting" value="True">
+         <input type="submit" name="delete" value="Delete Word">
+    </div>
+    </form>
+    {% endif %}
+
+{#    if($_POST['send']=='update')#}
+{#    { UPDATE table_name SET id='Your_ID' }#}
+{#    else#}
+{#    {DELETE FROM table_name WHERE id='Your_ID'}#}
+
+    {#<input type="submit">#}
+
+    {#    <input type="button" value="submit"/>Delete Word</input>#}
+    </table>
+    {#<input class="button" name="delete" type="submit" value="Delete Word?" style="margin-left:4%; margin-top:50px; width:15%">#}
+
+    {#<br>#}
+
 {% endblock %}

@@ -65,7 +65,21 @@
             <div></div>
             <div class="form-element"><input type="submit"></div>
         </div>
+
     </form>
+
+    <form method="POST">
+    {% if deleting %}
+        <div class="form-element">Are you sure?<input type="submit" name="delete_confirm" value="Yes">/<input type="submit" value="No"></div>
+    {% else %}
+    <div class="form-element">
+         <input type="hidden" name="deleting" value="True">
+         <input type="hidden" name="Category" value="{{ category }}">
+         <input type="submit" name="delete" value="Delete Category">
+    </div>
+    </form>
+    {% endif %}
+
 
 
 

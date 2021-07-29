@@ -12,6 +12,12 @@ app.secret_key = "ghjk;']'[569GHJ%^[;lasdhujkseglf7^%^bhtrjkg';&((*%^*&#$ghkdfgu
 DB_NAME = "dictionary.db"
 
 
+def intention(button):
+    if button in request.form:
+        return True
+    else:
+        return False
+
 def create_connection(db_file):
     """create a connection to the sqlite db - maori.db"""
     try:
@@ -31,6 +37,7 @@ def fetch_categories():
     categories = cur.fetchall()
     con.close()
     return categories
+
 
 
 @app.route('/', methods=["GET", "POST"])
@@ -60,12 +67,26 @@ def render_homepage():
 @app.route('/categories/<cat_id>', methods=["POST", "GET"])
 def render_categorypage(cat_id):
     if request.method == "POST" and is_logged_in():
-        maori = request.form['Maori Word'].strip().title()
-        english = request.form['English Word'].strip().title()
-        category = request.form['Word Category']
-        definition = request.form['Description'].strip().title()
-        levels = request.form['Difficulty Level']
+        category = request.form['Category']
+        if request.form.get("delete") == "Delete Category":
 
+            con = create_connection(DB_NAME)
+            cur = con.cursor()
+            query = "DELETE FROM category WHERE id=?"
+            cur.execute(query, (category,))
+            con.commit()
+            con.close()
+            return redirect('/')
+
+        print(request.form)
+
+        category = request.form['Category']
+        maori = request.form['maori'].strip().title()
+        english = request.form['english'].strip().title()
+        definition = request.form['definition'].strip().title()
+        levels = request.form['levels Level']
+
+        deleting = request.form.get('deleting')
         if len(english) < 1:
             return redirect("/menu?error=Wrong")
         elif len(maori) < 1:
@@ -97,12 +118,28 @@ def render_categorypage(cat_id):
     definition = cur.fetchall()
     print(definition)
     con.close()
-    return render_template('words.html', definitions=definition, logged_in=is_logged_in(),
-                           categories=fetch_categories())
+    return render_template('words.html', definitions=definition, logged_in=is_logged_in(), deleting=intention("delete"),
+                           categories=fetch_categories(), category=cat_id)
+
 
 
 @app.route('/detail/<word_id>', methods=["POST", "GET"])
 def render_detailpage(word_id):
+
+    if request.method == "POST" and is_logged_in():
+
+        if "delete_confirm" in request.form:
+            print(request.form)
+            con = create_connection(DB_NAME)
+            cur = con.cursor()
+            query = "DELETE FROM words WHERE id=?"
+            cur.execute(query, (word_id,))
+            con.commit()
+            con.close()
+            return redirect('/')
+
+            deleting = request.form.get('deleting')
+            print(request.form)
     con = create_connection(DB_NAME)
     query = "SELECT id, maori, english, definition, levels, images FROM words WHERE id=?"
     cur = con.cursor()
@@ -110,15 +147,14 @@ def render_detailpage(word_id):
     definition = cur.fetchall()[0]
     print(word_id)
 
-    if request.method == "POST" and is_logged_in():
-        query = "DELETE FROM words WHERE id = ?"
-        cur = con.cursor()
-        print(word_id)
-        cur.execute(query, (word_id,))
-        con.close()
-    return render_template('detail.html', definition=definition, logged_in=is_logged_in(),
-                           categories=fetch_categories())
 
+        # query = "DELETE FROM words WHERE id = ?"
+        # cur = con.cursor()
+        # print(word_id)
+        # cur.execute(query, (word_id,))
+        # con.close()
+    return render_template('detail.html', definition=definition, logged_in=is_logged_in(), categories=fetch_categories(),
+                           deleting=intention("delete"))
 
 @app.route('/login', methods=["GET", "POST"])
 def render_login_page():
@@ -197,6 +233,18 @@ def render_signup_page():
 
     return render_template('signup.html', logged_in=is_logged_in())
 
+#
+# "delete_confirm" in request.form:()
+#             con = create_connection(DB_NAME)
+#             cur = con.cursor()
+#             query = "DELETE FROM dictionary WHERE id=?"
+#             cur.execute(query, (maori))
+#             con.commit()
+#             con.close()
+#             return redirect('/')
+#
+#             deleting = request.form.get('deleting')
+#             # print(request.form))()
 
 @app.route('/logout')
 def logout():
@@ -219,10 +267,10 @@ def is_logged_in():
 def render_menu():
     return render_template('menu.html')
 
-# @app.route('/detail')
-# def render_delete():
-#
-#     return render_template('detail.html', categories=fetch_categories())
+@app.route('/detail')
+def render_delete():
+
+    return render_template('detail.html', categories=fetch_categories())
 
 if __name__ == "__main__":
     app.run(debug=True)
