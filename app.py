@@ -101,14 +101,21 @@ def render_categorypage(cat_id):
                            categories=fetch_categories())
 
 
-@app.route('/word/<word_id>')
+@app.route('/detail/<word_id>', methods=["POST", "GET"])
 def render_detailpage(word_id):
     con = create_connection(DB_NAME)
     query = "SELECT id, maori, english, definition, levels, images FROM words WHERE id=?"
     cur = con.cursor()
     cur.execute(query, (word_id,))
     definition = cur.fetchall()[0]
-    con.close()
+    print(word_id)
+
+    if request.method == "POST" and is_logged_in():
+        query = "DELETE FROM words WHERE id = ?"
+        cur = con.cursor()
+        print(word_id)
+        cur.execute(query, (word_id,))
+        con.close()
     return render_template('detail.html', definition=definition, logged_in=is_logged_in(),
                            categories=fetch_categories())
 
@@ -212,9 +219,10 @@ def is_logged_in():
 def render_menu():
     return render_template('menu.html')
 
-@app.route('/delete')
-def render_delete():
-    return render_template('   ')
+# @app.route('/detail')
+# def render_delete():
+#
+#     return render_template('detail.html', categories=fetch_categories())
 
 if __name__ == "__main__":
     app.run(debug=True)
