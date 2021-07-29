@@ -1,8 +1,9 @@
-from flask import Flask, render_template, session, redirect, request
+from flask import Flask, render_template, session, redirect, request, flash
 import sqlite3
 from sqlite3 import Error
 from flask_bcrypt import Bcrypt
-
+from datetime import datetime
+# this is the stuff I am importing to use for the future of my project
 app = Flask(__name__)
 
 bcrypt = Bcrypt(app)
@@ -10,13 +11,14 @@ app.secret_key = "ghjk;']'[569GHJ%^[;lasdhujkseglf7^%^bhtrjkg';&((*%^*&#$ghkdfgu
                  "F&*TG#$fjhSDJKF3487034[DW}_*$+HBDIUy894y389yUASDGfiwo9A(P{34(*SADtf#Wjg)"
 
 DB_NAME = "dictionary.db"
-
+# This is the name of my dictionary
 
 def intention(button):
     if button in request.form:
         return True
     else:
         return False
+#
 
 def create_connection(db_file):
     """create a connection to the sqlite db - maori.db"""
@@ -27,7 +29,7 @@ def create_connection(db_file):
         print(e)
 
     return None
-
+# This will create a connection with SQLite allowing me to use it in the future.
 
 def fetch_categories():
     con = create_connection(DB_NAME)
@@ -37,7 +39,7 @@ def fetch_categories():
     categories = cur.fetchall()
     con.close()
     return categories
-
+# This is fetching the categories so I can use them in my code later on
 
 
 @app.route('/', methods=["GET", "POST"])
@@ -47,27 +49,33 @@ def render_homepage():
         if len(category_name) < 3:
             return redirect("/?error=Name+must+be+at+least+3+letters+long.")
         else:
-            # connect to the database
+            # This code is the beginning of my home page and it will allow me to utilize different features
             con = create_connection(DB_NAME)
 
             query = "INSERT INTO category (id, category_name) VALUES(NULL, ?)"
 
-            cur = con.cursor()  # You need this line next
+            cur = con.cursor()
             try:
-                cur.execute(query, (category_name,))  # this line actually executes the query
+                cur.execute(query, (category_name,))  # This line is important as it executes the query
+
             except:
-                return redirect('/menu?error=Unknown+error')
+                flash('Category name already used, please choose a new name')  # duplicate categories cannot be used
+                return redirect(request.referrer)
+                return redirect('/?error=Unknown+error')
+
+
 
             con.commit()
             con.close()
 
     return render_template('home.html', logged_in=is_logged_in(), categories=fetch_categories())
-
+    # This renders the home template which I will use to place many different important things
 
 @app.route('/categories/<cat_id>', methods=["POST", "GET"])
+# This creates a webpage and then it
 def render_categorypage(cat_id):
     if request.method == "POST" and is_logged_in():
-        category = request.form['Category']
+        category = request.form.get('Category')
         if request.form.get("delete") == "Delete Category":
 
             con = create_connection(DB_NAME)
@@ -79,35 +87,88 @@ def render_categorypage(cat_id):
             return redirect('/')
 
         print(request.form)
-
-        category = request.form['Category']
-        maori = request.form['maori'].strip().title()
-        english = request.form['english'].strip().title()
-        definition = request.form['definition'].strip().title()
-        levels = request.form['levels Level']
-
+# This renders the page for the different word categories and it creates a connection with database
+        category = request.form.get('Category')
+        maori = request.form.get('Maori Word').strip().title()
+        english = request.form.get('English Word').strip().title()
+        definition = request.form.get('Description').strip().title()
+        levels = request.form.get('Difficulty Level')
+# This code above is used to pull information from the website regarding the items in the brackets. It then strips them
+        # of their unnecessary spaces and then gives them title case.
         deleting = request.form.get('deleting')
         if len(english) < 1:
             return redirect("/menu?error=Wrong")
         elif len(maori) < 1:
             return redirect("/menu?error=Wrong")
         else:
-            # connect to the database
-            con = create_connection(DB_NAME)
 
+            con = create_connection(DB_NAME)
+            # This connects it to the database
             query = "INSERT INTO words (maori, english, category, definition, levels, images, id) " \
                     "VALUES(?, ?, ?, ?, ?, ?, NULL)"
 
-            cur = con.cursor()  # You need this line next
+            cur = con.cursor()
             editor_id = session['userid']
             try:
+                # This line is used to execute the query
                 cur.execute(query, (
-                maori, english, category, definition, levels, editor_id))  # this line actually executes the query
+                maori, english, category, definition, levels, editor_id))
             except:
                 return redirect('/categories/' + cat_id + '?error=Unknown+error')
 
             con.commit()
             con.close()
+
+
+        if deleting == "False":
+            english = request.form.get('english').strip().title()
+            maori = request.form.get('maori').strip().title()
+            definitions = request.form.get('definitions').strip().lower()
+            levels = request.form.get('levels')
+
+            con = create_connection(DB_NAME)
+
+            query = "SELECT id, maori, english FROM words WHERE maori = ? or english = ?"
+            cur = con.cursor()
+            cur.execute(query, (maori, english))
+            # This executes the query
+            word_repeated = cur.fetchall()
+            # This puts the result into the table
+            con.close()
+
+
+            date_added = datetime.today().strftime("%A, %d, %B, %Y")
+            user_id = session['userid']
+            print("test 1")
+            if len(word_repeated) != 0:
+                flash('Word already exists in the Dictionary, try again')
+                print("test 2")
+                return redirect(request.referrer)
+            # This makes it so that if there is already a word that is in the database it doesn't allow it by showing
+            # An error message
+            elif len(maori) > 20:
+                flash('Maori word is over 20 characters, try again')
+                return redirect(request.referrer)
+            # This Makes it so that if a Maori word is over 20 characters long you have to shorten it.
+            elif len(english) > 20:
+                flash('English word is over 20 characters, try again')
+                return redirect(request.referrer)
+            # This does the same as the above but for English words
+            elif not 2 < len(definitions) < 100:
+                return redirect('Description must be below 100 and above 2')
+                return redirect(request.referrer)
+            else:
+                # This gives a limit on the description
+                print("test 3")
+                con = create_connection(DB_NAME)
+                query = "INSERT INTO words(id, maori, english, definitions, levels, category, images, editor_id, date_added) " \
+                    "VALUES(NULL,?,?,?,?,?, 'noimage', ?, ? )"
+                cur = con.cursor()
+                cur.execute(query, (maori, english, definitions, levels, cat_id, user_id, date_added))
+                con.commit()
+                con.close()
+                print("test 4")
+                # s
 
 
     con = create_connection(DB_NAME)
@@ -263,14 +324,14 @@ def is_logged_in():
         return True
 
 
-@app.route('/menu')
-def render_menu():
-    return render_template('menu.html')
-
-@app.route('/detail')
-def render_delete():
-
-    return render_template('detail.html', categories=fetch_categories())
+# @app.route('/menu')
+# def render_menu():
+#     return render_template('menu.html')
+#
+# @app.route('/detail')
+# def render_delete():
+#
+#     return render_template('detail.html', categories=fetch_categories())
 
 if __name__ == "__main__":
     app.run(debug=True)
