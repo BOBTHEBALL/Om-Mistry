@@ -168,7 +168,8 @@ def render_categorypage(cat_id):
                 con.commit()
                 con.close()
                 print("test 4")
-                # s
+                # This code above is used to secure the location of where the words are, this allows it to find out
+    #             Where duplicate words are
 
 
     con = create_connection(DB_NAME)
