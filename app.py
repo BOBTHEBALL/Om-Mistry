@@ -84,7 +84,8 @@ def render_homepage():
 def render_categorypage(cat_id):
     if request.method == "POST" and is_logged_in():
         category = request.form.get('Category')
-        if request.form.get("form") == "delete":
+        print(request.form)
+        if request.form.get("deleting") == "True":
             con = create_connection(DB_NAME)
             cur = con.cursor()
             query = "DELETE FROM category WHERE id=?"
@@ -96,10 +97,10 @@ def render_categorypage(cat_id):
         print(request.form)
         # This renders the page for the different word categories and it creates a connection with database
         category = request.form.get('Category')
-        maori = request.form.get('Maori Word').strip().title()
-        english = request.form.get('English Word').strip().title()
-        definition = request.form.get('Description').strip().title()
-        levels = request.form.get('Difficulty Level')
+        maori = request.form.get('maoriword').strip().title()
+        english = request.form.get('englishword').strip().title()
+        definition = request.form.get('description').strip().title()
+        levels = request.form.get('difficultylevel')
         # This code above is used to pull information from the website regarding the items in the brackets. It then strips them
         # of their unnecessary spaces and then gives them title case.
         deleting = request.form.get('deleting')
@@ -212,8 +213,10 @@ def render_categorypage(cat_id):
 @app.route('/detail/<word_id>', methods=["POST", "GET"])
 def render_detailpage(word_id):
     # This also creates a webpage but this one is for the word details, e.g when you click on a word
+    print(request.method)
     if request.method == "POST" and is_logged_in():
         # This line here makes sure that you have to be logged in to actually add/delete/edit
+        print("checking word")
         if "delete_confirm" in request.form:
             print(request.form)
             con = create_connection(DB_NAME)
@@ -223,9 +226,45 @@ def render_detailpage(word_id):
             con.commit()
             con.close()
             return redirect('/')
+        else:
 
-            deleting = request.form.get('deleting')
             print(request.form)
+            english = request.form.get('EnglishWord').strip().title()
+            maori = request.form.get('MaoriWord').strip().title()
+            definitions = request.form.get('Definitions').strip().lower()
+            levels = request.form.get('levels')
+            cat_id = request.form.get('Category')
+            con = create_connection(DB_NAME)
+
+            date_added = datetime.today().strftime("%A, %d, %B, %Y")
+            user_id = session['userid']
+            print("test 1")
+
+
+            if len(maori) > 20:
+                flash('Maori word is over 20 characters, try again')
+                return redirect(request.referrer)
+            # This Makes it so that if a Maori word is over 20 characters long you have to shorten it.
+            elif len(english) > 20:
+                flash('English word is over 20 characters, try again')
+                return redirect(request.referrer)
+            # This does the same as the above but for English words
+            elif not 2 < len(definitions) < 100:
+                return redirect('Description must be below 100 and above 2')
+                return redirect(request.referrer)
+            else:
+                # This gives a limit on the description
+                print("test 3")
+                con = create_connection(DB_NAME)
+                query = "UPDATE words " \
+                        "SET maori = ?, english = ?, definitions = ?, levels = ?, category = ?, editor_id = ?, date_added = ?) " \
+                        "WHERE id = ?"
+                cur = con.cursor()
+                # cur.execute(query, (maori, english, definitions, levels, cat_id, user_id, date_added))
+                cur.execute(query, (maori, english, definitions, levels, cat_id, user_id, date_added, word_id))
+                con.commit()
+                con.close()
+
     con = create_connection(DB_NAME)
     query = "SELECT id, maori, english, definition, levels, images FROM words WHERE id=?"
     cur = con.cursor()
