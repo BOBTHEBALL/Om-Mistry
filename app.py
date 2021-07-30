@@ -101,8 +101,8 @@ def render_categorypage(cat_id):
         english = request.form.get('englishword').strip().title()
         definition = request.form.get('description').strip().title()
         levels = request.form.get('difficultylevel')
-        # This code above is used to pull information from the website regarding the items in the brackets. It then strips them
-        # of their unnecessary spaces and then gives them title case.
+        # This code above is used to pull information from the website regarding the items in the brackets.
+        # It then strips them of their unnecessary spaces and then gives them title case.
         deleting = request.form.get('deleting')
         if len(english) < 1:
             return redirect("/menu?error=Wrong")
