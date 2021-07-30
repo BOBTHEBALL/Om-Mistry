@@ -1438,7 +1438,16 @@
       <DataType>integer|0s</DataType>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <key id="519" parent="174" name="words_pk">
+    <column id="519" parent="174" name="date_added">
+      <Position>8</Position>
+      <DataType>integer|0s</DataType>
+      <DefaultExpression>0</DefaultExpression>
+    </column>
+    <column id="520" parent="174" name="user_id">
+      <Position>9</Position>
+      <DataType>integer|0s</DataType>
+    </column>
+    <key id="521" parent="174" name="words_pk">
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
