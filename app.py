@@ -112,16 +112,17 @@ def render_categorypage(cat_id):
 
             con = create_connection(DB_NAME)
             # This connects it to the database
-            query = "INSERT INTO words (maori, english, category, definition, levels, images, id) " \
-                    "VALUES(?, ?, ?, ?, ?, ?, NULL)"
+            query = "INSERT INTO words (maori, english, category, definition, levels, images, user_id, id) " \
+                    "VALUES(?, ?, ?, ?, ?, ?, ?, NULL)"
 
             cur = con.cursor()
             editor_id = session['userid']
             try:
                 # This line is used to execute the query
                 cur.execute(query, (
-                    maori, english, category, definition, levels, editor_id))
-            except:
+                    maori, english, category, definition, levels, "noimage.jpg", editor_id))
+            except Exception as e:
+                print(e)
                 return redirect('/categories/' + cat_id + '?error=Unknown+error')
 
             con.commit()
