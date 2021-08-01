@@ -100,7 +100,7 @@ def render_categorypage(cat_id):
         maori = request.form.get('maoriword').strip().title()
         english = request.form.get('englishword').strip().title()
         definition = request.form.get('description').strip().title()
-        levels = request.form.get('difficultylevel')
+        levels = int(request.form.get('difficulty Level'))
         # This code above is used to pull information from the website regarding the items in the brackets.
         # It then strips them of their unnecessary spaces and then gives them title case.
         deleting = request.form.get('deleting')
